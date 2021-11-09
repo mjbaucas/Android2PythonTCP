@@ -29,6 +29,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
+        android:contentDescription="@string/placeholder"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -61,6 +62,18 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/counter"
+            android:id="@+id/counter">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Button android:id="@+id/connectButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,6 +83,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/disconnect"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/averageValue"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

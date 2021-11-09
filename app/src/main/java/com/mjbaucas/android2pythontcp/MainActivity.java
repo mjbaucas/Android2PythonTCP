@@ -6,6 +6,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static int TCP_SERVER_PORT = -1;
     private static String TCP_SERVER_HOST = null;
+    private static int COUNTER_LIMIT = -1;
+
+    private double AVERAGE_TIME = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +63,28 @@ public class MainActivity extends AppCompatActivity {
         binding.connectButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view){
-               TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
-               TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
+               try {
+                   TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
+                   TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
 
-               if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
-                   runTCPClient();
-                   binding.disconnectButton.setOnClickListener((new View.OnClickListener() {
-                       public void onClick(View view) {
-                           finish();
+                   if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
+                       for (int i = 0; i <= COUNTER_LIMIT; i++) {
+                           runTCPClient();
                        }
-                   }));
-               } else {
-                   finish();
+
+                       String tempString = "Average Time: " + AVERAGE_TIME / COUNTER_LIMIT;
+                       binding.averageValue.setText(tempString);
+
+                       binding.disconnectButton.setOnClickListener((new View.OnClickListener() {
+                           public void onClick(View view) {
+                               finish();
+                           }
+                       }));
+                   } else {
+                       finish();
+                   }
+               } catch (NullPointerException e){
+                   e.printStackTrace();
                }
            }
         });
@@ -78,22 +92,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void runTCPClient(){
         try {
-            Socket s = new Socket(TCP_SERVER_HOST, TCP_SERVER_PORT);//Note that the host is changed to the hostname or IP address of your server. < br / >
+            long start = SystemClock.elapsedRealtime();
+            Socket s = new Socket(TCP_SERVER_HOST, TCP_SERVER_PORT);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-            //send output msg
             String outMsg = "TCP connecting to " + TCP_SERVER_HOST + ":" + TCP_SERVER_PORT + System.getProperty("line.separator");
-            out.write(outMsg);//Send data & NBSP; < br / >
+            out.write(outMsg);
             out.flush();
             Log.i("TCPClient", "sent: " + outMsg);
-            //accept server response
-            String inMsg = in.readLine() + System.getProperty("line.separator");//Gets the data & NBSP; returned by the server; < br / >
+            String inMsg = in.readLine() + System.getProperty("line.separator");
             Log.i("TCPClient", "received: " + inMsg);
-            //close connection
+            long end = SystemClock.elapsedRealtime();
+            AVERAGE_TIME = AVERAGE_TIME + (end - start);
             s.close();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
