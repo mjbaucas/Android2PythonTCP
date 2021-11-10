@@ -11,9 +11,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((host_ip, port))  
 s.listen(4)  
 while True:  
+    print('Hello')
     conn, addr = s.accept()  
     print('Connected by', addr)  
-    data = conn.recv(1024)  
+    data = conn.recv(2048)  
     if not data: 
         break  
     conn.sendall(data)# Send back the received data intact   

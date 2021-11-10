@@ -6,6 +6,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.StrictMode;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.mjbaucas.android2pythontcp.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,16 +31,24 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
     private static int TCP_SERVER_PORT = -1;
     private static String TCP_SERVER_HOST = null;
-    private static int COUNTER_LIMIT = -1;
+
+    private String data128 = generateData(128);
+    private String data256 = generateData(256);
+    private String data512 = generateData(512);
+    private String data1024 = generateData(1024);
+    private String data = "";
+    private static final String[] sizes = {"128", "256", "512", "1024"};
 
     private double AVERAGE_TIME = 0.0;
+    private int COUNTER = 0;
+    private int TIME = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,34 +56,36 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.toolbar);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, sizes);
+        binding.selectSize.setAdapter(adapter);
+        binding.selectSize.setOnItemSelectedListener(this);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
 
         binding.connectButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view){
+               COUNTER = 0;
+               AVERAGE_TIME = 0.0;
+               long start = SystemClock.elapsedRealtime();
+
                try {
                    TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
                    TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
 
                    if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
-                       for (int i = 0; i <= COUNTER_LIMIT; i++) {
+                       long current = SystemClock.elapsedRealtime();
+                       while (current - start < TIME){
+                           current = SystemClock.elapsedRealtime();
+                           COUNTER++;
                            runTCPClient();
                        }
 
-                       String tempString = "Average Time: " + AVERAGE_TIME / COUNTER_LIMIT;
+                       String tempString = "Average Time: " + AVERAGE_TIME / COUNTER;
                        binding.averageValue.setText(tempString);
 
                        binding.disconnectButton.setOnClickListener((new View.OnClickListener() {
@@ -96,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
             Socket s = new Socket(TCP_SERVER_HOST, TCP_SERVER_PORT);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-            String outMsg = "TCP connecting to " + TCP_SERVER_HOST + ":" + TCP_SERVER_PORT + System.getProperty("line.separator");
+            //String outMsg = "TCP connecting to " + TCP_SERVER_HOST + ":" + TCP_SERVER_PORT + System.getProperty("line.separator");
+            String outMsg = data + System.getProperty("line.separator");
             out.write(outMsg);
             out.flush();
             Log.i("TCPClient", "sent: " + outMsg);
@@ -106,36 +120,40 @@ public class MainActivity extends AppCompatActivity {
             AVERAGE_TIME = AVERAGE_TIME + (end - start);
             s.close();
         } catch (Exception e) {
+            String tempString = "Error: " + e.toString();
+            binding.averageValue.setText(tempString);
             e.printStackTrace();
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    private String generateData(int size) {
+        String temp_string = "";
+        for (int i = 0; i <= size; i++) {
+            temp_string = temp_string + "x";
         }
-
-        return super.onOptionsItemSelected(item);
+        return temp_string;
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id){
+        switch (position) {
+            case 0:
+                data = data128;
+                break;
+            case 1:
+                data = data256;
+                break;
+            case 2:
+                data = data512;
+                break;
+            case 3:
+                data = data1024;
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
