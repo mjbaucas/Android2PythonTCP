@@ -8,7 +8,7 @@ average = 0.0
 host_ip = sys.argv[1]
 port = int(sys.argv[2])
 data = size_selector(sys.argv[3])
-limit = 5
+limit = 60
 
 
 
@@ -28,4 +28,4 @@ while current-timer < limit:
     current = time.time()
     print(current-timer)
 
-print("Average time: " + average)
+print("Average time: " + str(average))
