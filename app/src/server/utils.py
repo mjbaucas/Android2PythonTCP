@@ -11,6 +11,6 @@ def size_selector(option):
         return get_data(512)
     elif option == "256":
         return get_data(256)
-    else
+    else:
         return get_data(128)
     
