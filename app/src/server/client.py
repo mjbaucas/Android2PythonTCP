@@ -26,5 +26,6 @@ while current-timer < limit:
 
     print('Recieved', repr(recieved))
     current = time.time()
+    print(current-timer)
 
 print("Average time: " + average)
