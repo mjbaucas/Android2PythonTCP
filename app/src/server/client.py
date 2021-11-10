@@ -18,11 +18,11 @@ current = time.time()
 while current-timer < limit:
     start = time.time()
     s.sendall(str.encode(data))
-    data = s.recv(1024)
+    recieved = s.recv(1024)
     end = time.time()
     average += end - start
 
-    print('Recieved', repr(data))
+    print('Recieved', repr(recieved))
     current = time.time()
 
 print("Average time: " + average)
