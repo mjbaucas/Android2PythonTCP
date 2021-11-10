@@ -11,7 +11,7 @@ data = size_selector(sys.argv[3])
 limit = 60000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((HOST, PORT))
+s.connect((host_ip, port))
 
 timer = time.time()
 current = time.time()
