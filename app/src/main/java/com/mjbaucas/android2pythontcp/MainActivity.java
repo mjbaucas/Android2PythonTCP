@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private double AVERAGE_TIME = 0.0;
     private int COUNTER = 0;
-    private int TIME = 5000;
+    private int TIME = 60000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
