@@ -6,7 +6,7 @@ from utils import size_selector
 average = 0.0
 
 host_ip = sys.argv[1]
-port = sys.argv[2]
+port = int(sys.argv[2])
 data = size_selector(sys.argv[3])
 limit = 60000
 
