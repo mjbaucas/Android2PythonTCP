@@ -39,16 +39,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static int TCP_SERVER_PORT = -1;
     private static String TCP_SERVER_HOST = null;
 
-    private String data128 = generateData(128);
-    private String data256 = generateData(256);
-    private String data512 = generateData(512);
-    private String data1024 = generateData(1024);
+    private String data1 = generateData(1024);
+    private String data2 = generateData(2048);
+    private String data3= generateData(4096);
+    private String data4 = generateData(8192);
     private String data = "";
-    private static final String[] sizes = {"128", "256", "512", "1024"};
+    private static final String[] sizes = {"1024", "2048", "4096", "8192"};
 
     private double AVERAGE_TIME = 0.0;
     private int COUNTER = 0;
-    private int TIME = 60000;
+    private int TIME = 120000;
+    private boolean CONNECTED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,35 +70,51 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         binding.connectButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view){
-               COUNTER = 0;
-               AVERAGE_TIME = 0.0;
-               long start = SystemClock.elapsedRealtime();
+               if (CONNECTED == false) {
+                   COUNTER = 0;
+                   AVERAGE_TIME = 0.0;
+                   long start = SystemClock.elapsedRealtime();
 
-               try {
-                   TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
-                   TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
+                   try {
+                       TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
+                       TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
 
-                   if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
-                       long current = SystemClock.elapsedRealtime();
-                       while (current - start < TIME){
-                           current = SystemClock.elapsedRealtime();
-                           COUNTER++;
-                           runTCPClient();
+                       if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
+                           Thread thread = new Thread(new Runnable() {
+                               @Override
+                               public void run() {
+                                   try {
+                                       long current = SystemClock.elapsedRealtime();
+                                       while (current - start < TIME) {
+                                           current = SystemClock.elapsedRealtime();
+                                           COUNTER++;
+                                           runTCPClient();
+                                       }
+
+                                       runOnUiThread(new Runnable() {
+                                           @Override
+                                           public void run() {
+                                               String tempString = "Average Time: " + AVERAGE_TIME / COUNTER;
+                                               binding.averageValue.setText(tempString);
+                                               CONNECTED = false;
+                                           }
+                                       });
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
+                               }
+                           });
+                           thread.start();
+                       } else {
+                           finish();
                        }
-
-                       String tempString = "Average Time: " + AVERAGE_TIME / COUNTER;
-                       binding.averageValue.setText(tempString);
-
-                       binding.disconnectButton.setOnClickListener((new View.OnClickListener() {
-                           public void onClick(View view) {
-                               finish();
-                           }
-                       }));
-                   } else {
-                       finish();
+                   } catch (NullPointerException e) {
+                       e.printStackTrace();
                    }
-               } catch (NullPointerException e){
-                   e.printStackTrace();
+               } else {
+                   binding.connectButton.setText("Connect");
+                   CONNECTED = false;
+                   finish();
                }
            }
         });
@@ -121,7 +138,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             s.close();
         } catch (Exception e) {
             String tempString = "Error: " + e.toString();
-            binding.averageValue.setText(tempString);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    binding.averageValue.setText(tempString);
+                    COUNTER--;
+                }
+            });
             e.printStackTrace();
         }
     }
@@ -135,19 +158,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View v, int position, long id){
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         switch (position) {
             case 0:
-                data = data128;
+                data = data1;
                 break;
             case 1:
-                data = data256;
+                data = data2;
                 break;
             case 2:
-                data = data512;
+                data = data3;
                 break;
             case 3:
-                data = data1024;
+                data = data4;
                 break;
         }
     }
