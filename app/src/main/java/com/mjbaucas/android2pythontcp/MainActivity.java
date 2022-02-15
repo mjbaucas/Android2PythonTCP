@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                        long current = SystemClock.elapsedRealtime();
                                        while (current - start < TIME) {
                                            current = SystemClock.elapsedRealtime();
-                                           COUNTER++;
                                            runTCPClient();
                                        }
 
@@ -133,16 +132,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.i("TCPClient", "sent: " + outMsg);
             String inMsg = in.readLine() + System.getProperty("line.separator");
             Log.i("TCPClient", "received: " + inMsg);
+            s.close();
             long end = SystemClock.elapsedRealtime();
             AVERAGE_TIME = AVERAGE_TIME + (end - start);
-            s.close();
+            COUNTER++;
         } catch (Exception e) {
             String tempString = "Error: " + e.toString();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     binding.averageValue.setText(tempString);
-                    COUNTER--;
                 }
             });
             e.printStackTrace();
