@@ -8,8 +8,7 @@ average = 0.0
 host_ip = sys.argv[1]
 port = int(sys.argv[2])
 data = size_selector(sys.argv[3])
-limit = 60
-
+limit = 120
 
 
 timer = time.time()
