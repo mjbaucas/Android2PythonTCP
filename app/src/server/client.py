@@ -3,7 +3,8 @@ import socket
 import time
 from utils import size_selector
 
-average = 0.0
+total = 0.0
+counter = 0
 
 host_ip = sys.argv[1]
 port = int(sys.argv[2])
@@ -21,10 +22,11 @@ while current-timer < limit:
     s.sendall(str.encode(data))
     recieved = s.recv(2048)
     end = time.time()
-    average += end - start
+    total += (end - start)
+    counter+=1
 
     print('Recieved', repr(recieved))
     current = time.time()
     print(current-timer)
 
-print("Average time: " + str(average))
+print("Average time: " + str(total/counter))
