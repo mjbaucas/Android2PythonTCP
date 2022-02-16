@@ -15,7 +15,7 @@ while True:
     #print('Hello')
     conn, addr = s.accept()  
     print('Connected by', addr)  
-    data = recv_msg(conn, 128000)
+    data = recv_msg(conn)
     if not data: 
         break
     send_msg(conn, data)# Send back the received data intact
