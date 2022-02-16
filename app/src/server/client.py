@@ -15,14 +15,13 @@ limit = 120
 timer = time.time()
 current = time.time()
 while current-timer < limit:
-    start = time.time()
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
-    s.sendall(str.encode(data))
+    s.sendall(data)
     recieved = s.recv(20000)
     print('Recieved', repr(recieved))
     end = time.time()
-    diff = end-start
+    diff = end-current
     total += diff
     counter += 1
     current = end
