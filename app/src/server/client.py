@@ -1,7 +1,7 @@
 import sys
 import socket
 import time
-from utils import size_selector
+from utils import size_selector, recvall
 
 total = 0.0
 counter = 0
@@ -32,12 +32,3 @@ print("Total Time: " + str(total))
 print("Total Packets: " + str(counter))
 print("Average time: " + str(total/counter))
 
-def recvall(sock, buff_size):
-    data = b''
-    while True:
-        part = sock.recv(buff_size)
-        data += part
-        if len(part) < buff_size:
-            # either 0 or end of data
-            break
-    return data
