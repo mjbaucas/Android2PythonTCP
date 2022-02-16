@@ -22,11 +22,15 @@ while current-timer < limit:
     s.sendall(str.encode(data))
     recieved = s.recv(2048)
     end = time.time()
-    total += (end - start)
+    diff = end-start
+    total += diff
     counter+=1
 
     print('Recieved', repr(recieved))
     current = time.time()
-    print(current-timer)
+    print(diff)
+    #print(current-timer)
 
+print("Total Time: " + str(total))
+print("Total Packets: " + str(counter))
 print("Average time: " + str(total/counter))
