@@ -22,13 +22,13 @@ while current-timer < limit:
     end = time.time()
     diff = end-current
     current = end
-    if(len(recieved) == len(data)):
-        print(len(recieved))
-        print('Recieved', repr(recieved))
-        total += diff
-        counter += 1
-        print(diff)
-        #print(current-timer)
+    #if(len(recieved) == len(data)):
+    print(len(recieved))
+    print('Recieved', repr(recieved))
+    total += diff
+    counter += 1
+    print(diff)
+    #print(current-timer)
 
 print("Total Time: " + str(total))
 print("Total Packets: " + str(counter))
