@@ -9,7 +9,6 @@ def size_selector(option):
     
 def recvall(sock, buff_size):
     data = b''
-    print(buff_size)
     while True:
         part = sock.recv(buff_size)
         data += part
