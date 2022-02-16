@@ -20,14 +20,13 @@ while current-timer < limit:
     
     start = time.time()
     s.sendall(str.encode(data))
-    recieved = s.recv(2048)
+    recieved = s.recv(20000)
+    print('Recieved', repr(recieved))
     end = time.time()
     diff = end-start
     total += diff
-    counter+=1
-
-    print('Recieved', repr(recieved))
-    current = time.time()
+    counter += 1
+    current = end
     print(diff)
     #print(current-timer)
 
