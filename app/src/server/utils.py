@@ -5,12 +5,5 @@ def gen_data(size):
     return temp_string
 
 def size_selector(option):
-    if option == "1024":
-        return gen_data(1024)
-    elif option == "512":
-        return gen_data(512)
-    elif option == "256":
-        return gen_data(256)
-    else:
-        return gen_data(128)
+    return gen_data(int(option))
     
