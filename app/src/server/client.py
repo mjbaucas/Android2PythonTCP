@@ -18,7 +18,7 @@ while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
     s.sendall(str.encode(data))
-    recieved = s.recv(40000)
+    recieved = recvall(s, len(data))
     print('Recieved', repr(recieved))
     end = time.time()
     diff = end-current
@@ -31,3 +31,13 @@ while current-timer < limit:
 print("Total Time: " + str(total))
 print("Total Packets: " + str(counter))
 print("Average time: " + str(total/counter))
+
+def recvall(sock, buff_size):
+    data = b''
+    while True:
+        part = sock.recv(buff_size)
+        data += part
+        if len(part) < buff_size:
+            # either 0 or end of data
+            break
+    return data
