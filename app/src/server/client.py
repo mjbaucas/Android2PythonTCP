@@ -18,7 +18,7 @@ while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
     s.sendall(str.encode(data))
-    recieved = s.recv(20000)
+    recieved = s.recv(40000)
     print('Recieved', repr(recieved))
     end = time.time()
     diff = end-current
