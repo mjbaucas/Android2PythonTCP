@@ -18,6 +18,6 @@ while True:
     data = recv_msg(conn, 128000)
     if not data: 
         break
-    send_msg(conn, data[:500])# Send back the received data intact
+    send_msg(conn, data)# Send back the received data intact
     print('Received', repr(data))  
     conn.close()
