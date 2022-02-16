@@ -21,12 +21,12 @@ while current-timer < limit:
     recieved = recvall(s, len(data))
     end = time.time()
     diff = end-current
+    current = end
     if(len(recieved) == len(data)):
         print(len(recieved))
         print('Recieved', repr(recieved))
         total += diff
         counter += 1
-        current = end
         print(diff)
         #print(current-timer)
 
