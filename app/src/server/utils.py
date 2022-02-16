@@ -1,3 +1,5 @@
+import struct
+
 def gen_data(size):
     temp_string = ""
     for x in range(0, size):

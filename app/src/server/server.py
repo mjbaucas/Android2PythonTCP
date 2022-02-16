@@ -1,7 +1,7 @@
 
 import sys
 import socket  
-from utils import send_msg
+from utils import send_msg, recv_msg
   
 host_ip = sys.argv[1]  
 port = int(sys.argv[2])
