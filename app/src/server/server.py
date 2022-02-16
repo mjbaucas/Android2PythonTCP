@@ -14,10 +14,9 @@ while True:
     #print('Hello')
     conn, addr = s.accept()  
     print('Connected by', addr)  
-    data = conn.recv(40000)  
+    data = conn.recv(65537)  
     if not data: 
-        break  
-    len(data)
-    conn.sendall(data)# Send back the received data intact   
-    print('Received', repr(data))  
+        break
+    conn.sendall(data)# Send back the received data intact
+    #print('Received', repr(data))  
     conn.close()

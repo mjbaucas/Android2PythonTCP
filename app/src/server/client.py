@@ -19,15 +19,16 @@ while current-timer < limit:
     s.connect((host_ip, port))
     s.sendall(str.encode(data))
     recieved = recvall(s, len(data))
-    print(len(recieved))
-    print('Recieved', repr(recieved))
-    end = time.time()
-    diff = end-current
-    total += diff
-    counter += 1
-    current = end
-    print(diff)
-    #print(current-timer)
+    if(len(received) = len(data)):
+        print(len(recieved))
+        print('Recieved', repr(recieved))
+        end = time.time()
+        diff = end-current
+        total += diff
+        counter += 1
+        current = end
+        print(diff)
+        #print(current-timer)
 
 print("Total Time: " + str(total))
 print("Total Packets: " + str(counter))
