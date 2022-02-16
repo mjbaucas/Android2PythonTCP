@@ -1,6 +1,7 @@
 
 import sys
 import socket  
+from utils import send_msg
   
 host_ip = sys.argv[1]  
 port = int(sys.argv[2])
@@ -14,10 +15,9 @@ while True:
     #print('Hello')
     conn, addr = s.accept()  
     print('Connected by', addr)  
-    data = conn.recv(10000000)  
+    data = recv_msg(conn, 128000)
     if not data: 
         break
-    for x in range(5):
-        conn.sendall(data[:500])# Send back the received data intact
+    send_msg(conn, data[:500])# Send back the received data intact
     print('Received', repr(data))  
     conn.close()

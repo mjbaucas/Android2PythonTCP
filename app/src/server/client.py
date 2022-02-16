@@ -1,7 +1,7 @@
 import sys
 import socket
 import time
-from utils import size_selector, recvall
+from utils import size_selector, send_msg, recv_msg
 
 total = 0.0
 counter = 0
@@ -17,8 +17,8 @@ current = time.time()
 while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
-    s.sendall(str.encode(data))
-    recieved = recvall(s, len(data))
+    s.send_msg(s, str.encode(data))
+    recieved = recv_msg(s, len(data))
     end = time.time()
     diff = end-current
     current = end
