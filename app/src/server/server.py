@@ -17,6 +17,7 @@ while True:
     data = conn.recv(10000000)  
     if not data: 
         break
-    conn.sendall(data)# Send back the received data intact
+    for x in range(5):
+        conn.sendall(data[:500])# Send back the received data intact
     print('Received', repr(data))  
     conn.close()
