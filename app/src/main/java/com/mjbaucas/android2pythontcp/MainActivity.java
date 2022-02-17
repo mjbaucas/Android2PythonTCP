@@ -23,13 +23,19 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -43,8 +49,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String data2 = generateData(2048);
     private String data3= generateData(4096);
     private String data4 = generateData(8192);
+    private String data5 = generateData(16384);
+    private String data6 = generateData(32768);
     private String data = "";
-    private static final String[] sizes = {"1024", "2048", "4096", "8192"};
+    private static final String[] sizes = {"1K", "2K", "4K", "8K", "16K", "32K"};
 
     private double AVERAGE_TIME = 0.0;
     private int COUNTER = 0;
@@ -121,19 +129,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void runTCPClient(){
         try {
-            long start = SystemClock.elapsedRealtime();
+            //long start = SystemClock.elapsedRealtime();  // Include time to connect socket
             Socket s = new Socket(TCP_SERVER_HOST, TCP_SERVER_PORT);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+            DataInputStream dataIn = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+            DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             //String outMsg = "TCP connecting to " + TCP_SERVER_HOST + ":" + TCP_SERVER_PORT + System.getProperty("line.separator");
+            long start = SystemClock.elapsedRealtime();
             String outMsg = data + System.getProperty("line.separator");
-            out.write(outMsg);
-            out.flush();
-            Log.i("TCPClient", "sent: " + outMsg);
-            String inMsg = in.readLine() + System.getProperty("line.separator");
-            Log.i("TCPClient", "received: " + inMsg);
-            s.close();
+            dataOut.writeInt(outMsg.length());
+            dataOut.writeBytes(outMsg);
+            dataOut.flush();
+
+            int length = dataIn.readInt();
+            if(length > 0){
+                byte[] message = new byte[length];
+                dataIn.readFully(message, 0, message.length);
+                Log.i("TCPClient", "length: " + (message.length - 1) + " value: " + new String(message, StandardCharsets.UTF_8));
+            }
             long end = SystemClock.elapsedRealtime();
+            s.close();
+            //long end = SystemClock.elapsedRealtime(); // Include time to close socket
             AVERAGE_TIME = AVERAGE_TIME + (end - start);
             COUNTER++;
         } catch (Exception e) {
@@ -150,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private String generateData(int size) {
         String temp_string = "";
-        for (int i = 0; i <= size; i++) {
+        for (int i = 0; i <= size - 1; i++) {
             temp_string = temp_string + "x";
         }
         return temp_string;
@@ -170,6 +185,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 3:
                 data = data4;
+                break;
+            case 4:
+                data = data5;
+                break;
+            case 5:
+                data = data6;
                 break;
         }
     }
