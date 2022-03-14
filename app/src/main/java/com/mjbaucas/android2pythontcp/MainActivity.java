@@ -51,10 +51,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String data4 = generateData(8192);
     private String data5 = generateData(16384);
     private String data6 = generateData(32768);
+    private String dataX = generateData(0) + "default_0";
     private String data = "";
-    private static final String[] sizes = {"1K", "2K", "4K", "8K", "16K", "32K"};
+    private static final String[] sizes = {"1K", "2K", "4K", "8K", "16K", "32K", "chain"};
 
     private double AVERAGE_TIME = 0.0;
+    private double AVERAGE_PROCESSOR_TIME = 0.0;
     private int COUNTER = 0;
     private int TIME = 120000;
     private boolean CONNECTED = false;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                if (CONNECTED == false) {
                    COUNTER = 0;
                    AVERAGE_TIME = 0.0;
+                   AVERAGE_PROCESSOR_TIME = 0.0;
                    long start = SystemClock.elapsedRealtime();
 
                    try {
@@ -102,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                            @Override
                                            public void run() {
                                                String tempString = "Average Time: " + AVERAGE_TIME / COUNTER;
+                                               String tempStringP = "Average Processing Time: " + AVERAGE_PROCESSOR_TIME / COUNTER;
                                                binding.averageValue.setText(tempString);
+                                               binding.averageProcessorValue.setText(tempStringP);
                                                CONNECTED = false;
                                            }
                                        });
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void runTCPClient(){
         try {
-            //long start = SystemClock.elapsedRealtime();  // Include time to connect socket
+            long process_start = SystemClock.elapsedRealtime();  // Include time to connect socket
             Socket s = new Socket(TCP_SERVER_HOST, TCP_SERVER_PORT);
             DataInputStream dataIn = new DataInputStream(new BufferedInputStream(s.getInputStream()));
             DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
@@ -141,15 +146,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             dataOut.flush();
 
             int length = dataIn.readInt();
+            byte[] message = new byte[length];
+            double server_time = 0.0;
             if(length > 0){
-                byte[] message = new byte[length];
                 dataIn.readFully(message, 0, message.length);
-                Log.i("TCPClient", "length: " + (message.length - 1) + " value: " + new String(message, StandardCharsets.UTF_8));
+                server_time = Integer.parseInt(new String(message, StandardCharsets.UTF_8));
+                Log.i("TCPClient", "length: " + (message.length - 1) + " value: " + server_time);
             }
             long end = SystemClock.elapsedRealtime();
             s.close();
-            //long end = SystemClock.elapsedRealtime(); // Include time to close socket
+            long process_end = SystemClock.elapsedRealtime(); // Include time to close socket
             AVERAGE_TIME = AVERAGE_TIME + (end - start);
+            AVERAGE_PROCESSOR_TIME = AVERAGE_PROCESSOR_TIME + ((process_end - process_start) - (end - start)) + server_time;
             COUNTER++;
         } catch (Exception e) {
             String tempString = "Error: " + e.toString();
@@ -191,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 5:
                 data = data6;
+                break;
+            case 6:
+                data = dataX;
                 break;
         }
     }
