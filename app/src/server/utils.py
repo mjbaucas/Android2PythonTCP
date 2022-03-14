@@ -7,7 +7,10 @@ def gen_data(size):
     return temp_string
 
 def size_selector(option):
-    return gen_data(int(option))
+    if option == "chain":
+        return "default_0"
+    else:
+        return gen_data(int(option))
 
 def send_msg(sock, msg):
     # Prefix each message with a 4-byte length (network byte order)
