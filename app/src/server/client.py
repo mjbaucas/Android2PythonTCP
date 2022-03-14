@@ -21,14 +21,14 @@ while current-timer < limit:
     send_msg(s, str.encode(data))
     recieved = recv_msg(s)
     end = time.time()
-    diff = end-current
     diff_net = end-start
+    diff = end-current
     current = end
     #if(len(recieved) == len(data)):
     print(len(recieved))
     print('Recieved', repr(recieved))
     total += diff
-    total_process += (diff - diff_net + int(recieved))
+    total_process += ((diff - diff_net) + (float(recieved)/1000))
     counter += 1
     #print(diff)
     #print(current-timer)
