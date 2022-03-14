@@ -36,5 +36,5 @@ while current-timer < limit:
 print("Total Time: " + str(total))
 print("Total Packets: " + str(counter))
 print("Average time: " + str(total/counter))
-print("Average Processor time: " + str(total/counter))
+print("Average Processor time: " + str(total_process/counter))
 
