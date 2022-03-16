@@ -26,6 +26,10 @@ chain = int(sys.argv[4])
 size_of_block = int(sys.argv[5])
 limit = 120
 
+trusted_list = [
+    "default",
+]
+
 for x in range(0, size_of_block):
     trusted_list.append("item" + str(x))
 
