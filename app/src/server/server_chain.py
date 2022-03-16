@@ -1,5 +1,5 @@
 
-# length of chain - size in bytes
+# size of block - in bytes
 # 2 - 120
 # 109 - 1080 
 # 235 - 2200
@@ -12,6 +12,7 @@ import sys
 sys.path.append('../')
 sys.path.append('../blockchain')
 
+import json
 import datetime
 import socket  
 from utils import send_msg, recv_msg
@@ -28,9 +29,10 @@ trusted_list = [
     "default",
 ]
 
+# Public Key generated from an Secret Key of "0"
 secret_key = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
 
-for x in range(0, 109):
+for x in range(0, 3650):
     trusted_list.append("item" + str(x))
 
 public_chain = PublicBlockChain(3)
@@ -51,6 +53,9 @@ s.bind((host_ip, port))
 s.listen(10)  
 total = 0
 counter = 0
+
+proof = public_chain.proof_of_work(public_chain.chain[1])
+
 while True:  
     conn, addr = s.accept()  
     print('Connected by', addr)  
@@ -58,17 +63,17 @@ while True:
     if not data: 
         break
     print(data)
-    message = data.decode().split("_")[0]
-    print(message)
+    message = data.decode().split("_")
+    print(message[0])
     
     delta = 0.0
     verified = False
     if mode == 0:
-        # For private verification you need to provide the id of the transaction and the public key of the block to access.
+        # For private verification, you need to provide the id of the transaction and the secret key of the block to access.
         start = datetime.datetime.now()
-        found_block = private_chain.search_ledger("0")
+        found_block = private_chain.search_ledger(message[1]) # Pulls the 2nd block in the chain
         if found_block != None:
-            if "default" in found_block.transactions:
+            if message[0] in found_block.transactions: 
                 end = datetime.datetime.now()
                 delta = int((end - start).total_seconds()*1000)
                 total+= delta
@@ -76,14 +81,12 @@ while True:
                 verified = True
                 counter+=1
     elif mode == 1:
-        proof = public_chain.proof_of_work(public_chain.chain[1])
-        # For public verification you need to provide the id of the transaction of the block and your proof of work to mine the block
+        # For public verification, it is assumed that the user already notified the server what block it is asking to access and is now providing proof of work to access it.
         start = datetime.datetime.now()
-        found_block = public_chain.search_ledger("0")
+        found_block = public_chain.search_ledger(message[1]) # Pulls the block from the chain specified by the provided secret key
         if found_block != None:
-            if "default" in found_block.transactions:
-                proof = public_chain.proof_of_work(found_block)
-                if (public_chain.verify_proof(found_block, proof)): # Compare with the proof from device
+            if message[0] in found_block.transactions:
+                if (public_chain.verify_proof(found_block, proof)): # Simulates a successful verification assuming that the device will always provide the correct proof of work.
                     end = datetime.datetime.now()
                     delta = int((end - start).total_seconds()*1000)
                     total+= delta

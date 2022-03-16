@@ -1,4 +1,16 @@
+# size of block - in bytes
+# 2 - 120
+# 109 - 1080 
+# 235 - 2200
+# 456 - 4216
+# 971 - 8800~
+# 1788 - 16184
+# 3650 - 33048
+
 import sys
+sys.path.append('../')
+sys.path.append('../blockchain')
+
 import socket
 import time
 from utils import size_selector, send_msg, recv_msg
@@ -10,7 +22,15 @@ counter = 0
 host_ip = sys.argv[1]
 port = int(sys.argv[2])
 data = size_selector(sys.argv[3])
+chain = int(sys.argv[4])
+size_of_block = int(sys.argv[5])
 limit = 120
+
+for x in range(0, size_of_block):
+    trusted_list.append("item" + str(x))
+
+public_chain = PublicBlockChain(3)
+public_chain.gen_next_block(secret_key, trusted_list)
 
 timer = time.time()
 current = time.time()
@@ -18,6 +38,8 @@ while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
     start = time.time()
+    if chain == 1:
+        data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
     send_msg(s, str.encode(data))
     recieved = recv_msg(s)
     end = time.time()
