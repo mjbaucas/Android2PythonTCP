@@ -14,6 +14,7 @@ sys.path.append('../blockchain')
 import socket
 import time
 from utils import size_selector, send_msg, recv_msg
+from blockchain.public import Chain as PublicBlockChain
 
 total = 0.0
 total_process = 0.0
