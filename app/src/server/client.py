@@ -45,9 +45,9 @@ current = time.time()
 while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
-    start = time.time()
     if chain == 1:
         data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
+    start = time.time()
     send_msg(s, str.encode(data))
     recieved = recv_msg(s)
     end = time.time()

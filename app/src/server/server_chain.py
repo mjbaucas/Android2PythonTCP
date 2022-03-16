@@ -68,6 +68,7 @@ while True:
     
     delta = 0.0
     verified = False
+    print(mode)
     if mode == 0:
         # For private verification, you need to provide the id of the transaction and the secret key of the block to access.
         start = datetime.datetime.now()
@@ -81,18 +82,17 @@ while True:
                 verified = True
                 counter+=1
     elif mode == 1:
-        # For public verification, it is assumed that the user already notified the server what block it is asking to access and is now providing proof of work to access it.
+        # For public verification, the user will provide the block id and the proof of work to access it.
         start = datetime.datetime.now()
         found_block = public_chain.search_ledger(message[1]) # Pulls the block from the chain specified by the provided secret key
         if found_block != None:
-            if message[0] in found_block.transactions:
-                if (public_chain.verify_proof(found_block, proof)): # Simulates a successful verification assuming that the device will always provide the correct proof of work.
-                    end = datetime.datetime.now()
-                    delta = int((end - start).total_seconds()*1000)
-                    total+= delta
-                    #print(delta)
-                    verified = True
-                    counter+=1
+            if (public_chain.verify_proof(found_block, proof)): # Simulates a successful verification assuming that the device will always provide the correct proof of work.
+                end = datetime.datetime.now()
+                delta = int((end - start).total_seconds()*1000)
+                total+= delta
+                #print(delta)
+                verified = True
+                counter+=1
 
     msg = "denied"
     if verified:
