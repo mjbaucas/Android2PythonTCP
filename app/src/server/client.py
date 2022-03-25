@@ -45,10 +45,12 @@ current = time.time()
 while current-timer < limit:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host_ip, port))
-    if chain == 1:
-        data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
     start = time.time()
-    send_msg(s, str.encode(data))
+    if chain == 1:
+        new_data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
+        send_msg(s, str.encode(new_data))
+    else 
+        send_msg(s, str.encode(data))
     recieved = recv_msg(s)
     end = time.time()
     diff_net = end-start

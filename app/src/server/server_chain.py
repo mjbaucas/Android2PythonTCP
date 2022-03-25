@@ -32,7 +32,7 @@ trusted_list = [
 # Public Key generated from an Secret Key of "0"
 secret_key = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
 
-for x in range(0, 3650):
+for x in range(0, 456):
     trusted_list.append("item" + str(x))
 
 public_chain = PublicBlockChain(3)
