@@ -49,7 +49,7 @@ while current-timer < limit:
     if chain == 1:
         new_data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
         send_msg(s, str.encode(new_data))
-    else 
+    else:
         send_msg(s, str.encode(data))
     recieved = recv_msg(s)
     end = time.time()
