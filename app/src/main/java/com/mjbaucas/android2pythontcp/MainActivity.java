@@ -1,41 +1,29 @@
 package com.mjbaucas.android2pythontcp;
 
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
-
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.mjbaucas.android2pythontcp.databinding.ActivityMainBinding;
-
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.ui.AppBarConfiguration;
+
+import com.mjbaucas.android2pythontcp.databinding.ActivityMainBinding;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -45,25 +33,47 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static int TCP_SERVER_PORT = -1;
     private static String TCP_SERVER_HOST = null;
 
-    private String data1 = generateData(1024);
-    private String data2 = generateData(2048);
-    private String data3= generateData(4096);
-    private String data4 = generateData(8192);
-    private String data5 = generateData(16384);
-    private String data6 = generateData(32768);
-    private String dataX = generateData(0) + "default_0";
-    private String data = "";
-    private static final String[] sizes = {"1K", "2K", "4K", "8K", "16K", "32K", "chain"};
-
     private double AVERAGE_TIME = 0.0;
     private double AVERAGE_PROCESSOR_TIME = 0.0;
     private int COUNTER = 0;
     private int TIME = 120000;
     private boolean CONNECTED = false;
+    private String SECRETKEY = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9";
+    private PublicChain PCHAIN;
+
+    /*
+        109 - 1080
+        235 - 2200
+        456 - 4216
+        971 - 8800~
+        1788 - 16184
+        3650 - 33048
+    */
+    private int SIZEOFBLOCK = 3650;
+    private int CHAINMODE = 1;
+
+    private String data1;
+    private String data2;
+    private String data3;
+    private String data4;
+    private String data5;
+    private String data6;
+    private String dataX = generateData(0) + "default_0";
+    private String data = "";
+    private static final String[] sizes = {"1K", "2K", "4K", "8K", "16K", "32K", "chain"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(CHAINMODE == 0){
+            data1 = generateData(1024);
+            data2 = generateData(2048);
+            data3 = generateData(4096);
+            data4 = generateData(8192);
+            data5 = generateData(16384);
+            data6 = generateData(32768);
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -77,6 +87,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             StrictMode.setThreadPolicy(policy);
         }
 
+        ArrayList<String> trustedList = new ArrayList<String>();
+        trustedList.add("default");
+
+
+        for (int i = 0; i < SIZEOFBLOCK; i++){
+            trustedList.add("item" + Integer.toString(i));
+        }
+
+        try {
+            PCHAIN = new PublicChain(2);
+            PCHAIN.genNextBlock(SECRETKEY, trustedList);
+            Log.i("Block Size", "size: " + serialize(PCHAIN.getBlock(1).getTransactions()).length);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         binding.connectButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view){
@@ -87,8 +115,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                    long start = SystemClock.elapsedRealtime();
 
                    try {
-                       TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
-                       TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
+                       //TCP_SERVER_HOST = binding.hostname.getEditText().getText().toString();
+                       //TCP_SERVER_PORT = Integer.parseInt(binding.port.getEditText().getText().toString());
+
+                       TCP_SERVER_HOST = "192.168.2.132";
+                       TCP_SERVER_PORT = 5000;
 
                        if (TCP_SERVER_HOST != null && TCP_SERVER_PORT != -1) {
                            Thread thread = new Thread(new Runnable() {
@@ -139,8 +170,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             DataInputStream dataIn = new DataInputStream(new BufferedInputStream(s.getInputStream()));
             DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             //String outMsg = "TCP connecting to " + TCP_SERVER_HOST + ":" + TCP_SERVER_PORT + System.getProperty("line.separator");
-            long start = SystemClock.elapsedRealtime();
-            String outMsg = data + System.getProperty("line.separator");
+            long start;
+            String outMsg;
+            if (CHAINMODE == 1){
+                String newData = data + "_" + PCHAIN.proofOfWork(PCHAIN.getBlock(1));
+                start = SystemClock.elapsedRealtime();
+                outMsg = newData + System.getProperty("line.separator");
+            } else {
+                start = SystemClock.elapsedRealtime();
+                outMsg = data + System.getProperty("line.separator");
+            }
             dataOut.writeInt(outMsg.length());
             dataOut.writeBytes(outMsg);
             dataOut.flush();
@@ -151,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if(length > 0){
                 dataIn.readFully(message, 0, message.length);
                 server_time = Integer.parseInt(new String(message, StandardCharsets.UTF_8));
-                Log.i("TCPClient", "length: " + (message.length - 1) + " value: " + server_time);
+                Log.i("TCPClient", "length: " + (message.length - 1) + " value: " + server_time + " proc diff: " + AVERAGE_PROCESSOR_TIME + " counter: " + COUNTER);
             }
             long end = SystemClock.elapsedRealtime();
             s.close();
@@ -209,5 +248,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        return baos.toByteArray();
     }
 }

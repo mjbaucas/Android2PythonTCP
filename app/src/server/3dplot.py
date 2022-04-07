@@ -9,6 +9,15 @@ chain_label = [1, 10, 100.0, 1000.0, 10000.0, 100000.0]
 block_tick = np.arange(6)
 block_label = [1, 2, 4, 8, 16, 32]
 
+time_tick = np.arange(6)
+time_label = [1, 10, 100.0, 1000.0, 10000.0, 100000.0]
+
+cbar_tick = np.arange(6)
+cbar_label = [r"$10^0$", r"$10^1$", r"$10^2$", r"$10^3$", r"$10^4$", r"$10^5$"]
+
+
+subtitles = ['a) LG Phone w/ Private blockchain', 'b) Samsung Watch w/ Private blockchain', 'c) Raspberry Pi w/ Private blockchain', 'd) LG Phone w/ Public blockchain', 'e) Samsung Watch w/ Public blockchain', 'f) Raspberry Pi w/ Public blockchain']
+
 data = [np.array([
         [100, 1, 8.20],
         [100, 2, 8.22],
@@ -88,30 +97,30 @@ data = [np.array([
         [100000, 32, 120.14]]
     ),
         np.array([
-        [100, 1, 8.20],
-        [100, 2, 8.22],
-        [100, 4, 9.09],
-        [100, 8, 9.14],
-        [100, 16, 9.32],
-        [100, 32, 9.62],
-        [1000, 1, 8.76],
-        [1000, 2, 8.86],
-        [1000, 4, 9.64],
-        [1000, 8, 9.62],
-        [1000, 16, 9.81],
-        [1000, 32, 9.81],
-        [10000, 1, 17.85],
-        [10000, 2, 18.02],
-        [10000, 4, 18.35],
-        [10000, 8, 18.45],
-        [10000, 16, 21.70],
-        [10000, 32, 23.35],
-        [100000, 1, 108.33],
-        [100000, 2, 110.96],
-        [100000, 4, 122.32],
-        [100000, 8, 125.17],
-        [100000, 16, 128.31],
-        [100000, 32, 128.6]]
+        [100, 1, 120.92],
+        [100, 2, 644.70],
+        [100, 4, 1559.86],
+        [100, 8, 2346.17],
+        [100, 16, 3151.94],
+        [100, 32, 5676.83],
+        [1000, 1, 122.42],
+        [1000, 2, 618.54],
+        [1000, 4, 1556.40],
+        [1000, 8, 2339.08],
+        [1000, 16, 3200.00],
+        [1000, 32, 5867.16],
+        [10000, 1, 138.12],
+        [10000, 2, 592.63],
+        [10000, 4, 1651.18],
+        [10000, 8, 2405.34],
+        [10000, 16, 3436.52],
+        [10000, 32, 6038.87],
+        [100000, 1, 344.71],
+        [100000, 2, 770.81],
+        [100000, 4, 1759.28],
+        [100000, 8, 2535.37],
+        [100000, 16, 3663.54],
+        [100000, 32, 6318.13]]
     ),
         np.array([
         [100, 1, 8.20],
@@ -139,7 +148,7 @@ data = [np.array([
         [100000, 16, 128.31],
         [100000, 32, 128.6]]
     ),
-        np.array([
+    np.array([
         [100, 1, 8.20],
         [100, 2, 8.22],
         [100, 4, 9.09],
@@ -164,12 +173,37 @@ data = [np.array([
         [100000, 8, 125.17],
         [100000, 16, 128.31],
         [100000, 32, 128.6]]
+        #np.array([
+        #[100, 1, 553.72],
+        #[100, 2, 1345.04],
+        #[100, 4, 5413.55],
+        #[100, 8, 21439.00],
+        #[100, 16, 24466.60],
+        #[100, 32, 29110.60],
+        #[1000, 1, 1882.61],
+        #[1000, 2, 3429.22],
+        #[1000, 4, 10794.70],
+        #[1000, 8, 24317.70],
+        #[1000, 16, 29045.10],
+        #[1000, 32, 55096.70],
+        #[10000, 1, 2141.69],
+        #[10000, 2, 4361.21],
+        #[10000, 4, 14359.40],
+        #[10000, 8, 26494.00],
+        #[10000, 16, 35383.30],
+        #[10000, 32, 66192.20],
+        #[100000, 1, 3026.66],
+        #[100000, 2, 6696.84],
+        #[100000, 4, 17354.40],
+        #[100000, 8, 28347.50],
+        #[100000, 16, 44228.50],
+        #[100000, 32, 87038.60]]
     )]
 
 def log_tick_formatter(val, pos=None):
     return r"$10^{:.0f}$".format(val)
 
-fig = plt.figure(figsize=(18, 9), dpi=300)
+fig = plt.figure(figsize=(18, 10), dpi=300)
 grid = fig.add_gridspec(2, 3)
 
 ax = []
@@ -180,17 +214,26 @@ for i in range(0,2):
         x = data[counter][:,1]
         y = data[counter][:,0]
         z = data[counter][:,2]
-
+        
         ax.append(fig.add_subplot(grid[i, j], projection='3d'))
-        surf.append(ax[counter].plot_trisurf(np.log2(x), np.log10(y), z, cmap=cm.get_cmap('cividis', 20), vmin=0, vmax=200))
-        ax[counter].view_init(20, -50)
+        surf.append(ax[counter].plot_trisurf(np.log2(x), np.log10(y), np.log10(z), cmap=cm.get_cmap('tab20b', 40), vmin=0, vmax=5))
+        
+        if counter < 3:
+            ax[counter].view_init(20, -40)
+        else:
+            ax[counter].view_init(20, -70)
+            
+        ax[counter].set_zticks(time_tick)
+        ax[counter].set_zticklabels(time_label)
     
         # Axis formatting
         plt.xticks(block_tick, block_label)
         plt.yticks(chain_tick, chain_label)
         plt.ylim(2, 5)
         plt.rc('axes', labelsize=8)  
+        plt.title(subtitles[counter], y=-0.2)
         ax[counter].yaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
+        ax[counter].zaxis.set_major_formatter(mticker.FuncFormatter(log_tick_formatter))
         
         ax[counter].set_xlabel('block size (KB)', fontsize=10)
         ax[counter].set_ylabel('chain length (blocks)', fontsize=10)
@@ -198,7 +241,9 @@ for i in range(0,2):
 
         counter+=1
 
-plt.subplots_adjust(wspace=0, hspace=0.05)
-cb = fig.colorbar(surf[1], ax=(ax[0], ax[1], ax[2], ax[3], ax[4], ax[5]), orientation='vertical', fraction=0.06, pad=0.06)
+plt.subplots_adjust(wspace=0.4, hspace=0.05)
+cb = fig.colorbar(surf[1], ax=(ax[0], ax[1], ax[2], ax[3], ax[4], ax[5]), orientation='vertical', fraction=0.06, pad=0.06, label="processing time (ms)")
+cb.set_ticks(cbar_tick)
+cb.set_ticklabels(cbar_label)
 
 plt.savefig('process.png', bbox_inches='tight')

@@ -29,13 +29,18 @@ trusted_list = [
     "default",
 ]
 
+# print(trusted_list.__sizeof__())
+
 # Public Key generated from an Secret Key of "0"
 secret_key = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
 
-for x in range(0, 456):
+
+for x in range(0, 3650):
     trusted_list.append("item" + str(x))
 
-public_chain = PublicBlockChain(3)
+# print(trusted_list.__sizeof__())
+
+public_chain = PublicBlockChain(2)
 public_chain.gen_next_block(secret_key, trusted_list)
 
 private_chain = PrivateBlockChain()
@@ -101,4 +106,3 @@ while True:
     print('Result:' + msg )
     print("Average Time: " + str(total/counter))  
     conn.close()
-
