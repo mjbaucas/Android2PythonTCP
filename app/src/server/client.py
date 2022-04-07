@@ -16,10 +16,6 @@ import time
 from utils import size_selector, send_msg, recv_msg
 from blockchain.public import Chain as PublicBlockChain
 
-total = 0.0
-total_process = 0.0
-counter = 0
-
 host_ip = sys.argv[1]
 port = int(sys.argv[2])
 data = size_selector(sys.argv[3])
@@ -40,34 +36,48 @@ for x in range(0, size_of_block):
 public_chain = PublicBlockChain(2)
 public_chain.gen_next_block(secret_key, trusted_list)
 
-timer = time.time()
-current = time.time()
-while current-timer < limit:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host_ip, port))
-    if chain == 1:
-        new_data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
-        start = time.time()
-        send_msg(s, str.encode(new_data))
-    else:
-        start = time.time()
-        send_msg(s, str.encode(data))
-    recieved = recv_msg(s)
-    end = time.time()
-    diff_net = end-start
-    diff = end-current
-    current = end
-    #if(len(recieved) == len(data)):
-    print(len(recieved))
-    print('Recieved', repr(recieved))
-    total += diff
-    total_process += ((diff - diff_net) + (float(recieved)/1000))
-    counter += 1
-    #print(diff)
-    #print(current-timer)
+transmission_time = []
+process_time = []
 
-print("Total Time: " + str(total))
-print("Total Packets: " + str(counter))
-print("Average time: " + str(total/counter))
-print("Average Processor time: " + str(total_process/counter))
+
+for i in range(0,3):
+    total = 0.0
+    total_process = 0.0
+    counter = 0
+
+    timer = time.time()
+    current = time.time()
+    while current-timer < limit:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host_ip, port))
+        if chain == 1:
+            new_data = data + "_" + public_chain.proof_of_work(public_chain.chain[1])
+            start = time.time()
+            send_msg(s, str.encode(new_data))
+        else:
+            start = time.time()
+            send_msg(s, str.encode(data))
+        recieved = recv_msg(s)
+        end = time.time()
+        diff_net = end-start
+        diff = end-current
+        current = end
+        #if(len(recieved) == len(data)):
+        #print(len(recieved))
+        #print('Recieved', repr(recieved))
+        total += diff
+        total_process += ((diff - diff_net) + (float(recieved)/1000))
+        counter += 1
+        #print(diff)
+        #print(current-timer)
+
+    print("Total Time: " + str(total))
+    print("Total Packets: " + str(counter))
+    print("Average time: " + str(total/counter))
+    transmission_time.append(total/counter)
+    print("Average Processor time: " + str(total_process/counter))
+    transmission_time.append(total_process/counter)
+
+print("Average Times: " + str(transmission_time))
+print("Average Processor Times: " + str(process_time))
 
