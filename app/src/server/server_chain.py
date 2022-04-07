@@ -35,7 +35,7 @@ trusted_list = [
 secret_key = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
 
 
-for x in range(0, 109):
+for x in range(0, 971):
     trusted_list.append("item" + str(x))
 
 # print(trusted_list.__sizeof__())
