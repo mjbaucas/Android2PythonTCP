@@ -37,7 +37,7 @@ secret_key = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
 for x in range(0, size_of_block):
     trusted_list.append("item" + str(x))
 
-public_chain = PublicBlockChain(3)
+public_chain = PublicBlockChain(2)
 public_chain.gen_next_block(secret_key, trusted_list)
 
 timer = time.time()
