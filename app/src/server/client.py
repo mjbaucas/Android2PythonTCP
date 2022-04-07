@@ -76,7 +76,7 @@ for i in range(0,3):
     print("Average time: " + str(total/counter))
     transmission_time.append(total/counter)
     print("Average Processor time: " + str(total_process/counter))
-    transmission_time.append(total_process/counter)
+    process_time.append(total_process/counter)
 
 print("Average Times: " + str(transmission_time))
 print("Average Processor Times: " + str(process_time))
