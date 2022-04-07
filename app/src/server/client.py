@@ -64,7 +64,7 @@ for i in range(0,3):
         current = end
         #if(len(recieved) == len(data)):
         #print(len(recieved))
-        #print('Recieved', repr(recieved))
+        print('Recieved', repr(recieved))
         total += diff
         total_process += ((diff - diff_net) + (float(recieved)/1000))
         counter += 1
